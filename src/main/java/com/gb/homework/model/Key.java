@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -17,7 +18,7 @@ import javax.persistence.OneToOne;
 public class Key {
 
     @Id
-    private String apiKey;
+    private UUID apiKey;
 
     @OneToOne
     private Client client;

@@ -34,8 +34,9 @@ public class ClientService {
                 .build();
 
         UUID apiKey = UUID.randomUUID();
+
         Key newKey = Key.builder()
-                .apiKey(passWordEncoder.encode(apiKey.toString()))
+                .apiKey(apiKey)
                 .client(newClient)
                 .build();
 
