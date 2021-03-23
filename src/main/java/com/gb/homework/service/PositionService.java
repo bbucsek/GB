@@ -7,6 +7,8 @@ import com.gb.homework.repository.PositionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class PositionService {
 
@@ -29,5 +31,10 @@ public class PositionService {
 
         positionRepository.save(newPosition);
         return "localhost:8080/positions/" + newPosition.getId();
+    }
+
+    public Position getPosition(UUID id) {
+
+        return positionRepository.findById(id).get();
     }
 }
