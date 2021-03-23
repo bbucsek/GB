@@ -7,6 +7,7 @@ import com.gb.homework.repository.PositionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -36,5 +37,14 @@ public class PositionService {
     public Position getPosition(UUID id) {
 
         return positionRepository.findById(id).get();
+    }
+
+    public Set<Position> searchPositions(String keyword, String location, UUID apiKey) throws Error {
+
+        keyRepository
+                .findById(apiKey)
+                .orElseThrow(() -> new Error("not good"));
+
+        return positionRepository.getPositionByKeywordAndLocation(keyword, location);
     }
 }

@@ -27,5 +27,14 @@ public class PositionController {
 
         return positionService.createPosition(positionCredentials);
     }
-    
+
+    @GetMapping()
+    public Set<Position> searchPositions(
+            @RequestParam(required = false)
+                    String keyword,
+                    String location,
+            @RequestParam UUID apiKey) {
+
+        return positionService.searchPositions(keyword, location, apiKey);
+    }
 }
