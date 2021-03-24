@@ -1,5 +1,6 @@
 package com.gb.homework.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,10 +20,13 @@ public class Position {
 
     @Id
     @GeneratedValue
+    @JsonIgnore
     private UUID id;
 
     private String title;
 
     private String location;
+
+    private String url;
 
 }

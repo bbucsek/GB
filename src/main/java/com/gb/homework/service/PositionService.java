@@ -5,6 +5,7 @@ import com.gb.homework.model.api.ResponseItem;
 import com.gb.homework.model.credentials.PositionCredentials;
 import com.gb.homework.repository.KeyRepository;
 import com.gb.homework.repository.PositionRepository;
+import com.gb.homework.util.ResponseConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -23,6 +24,9 @@ public class PositionService {
 
     @Autowired
     KeyRepository keyRepository;
+
+    @Autowired
+    ResponseConverter responseConverter;
 
     @Value("https://jobs.github.com/positions.json?")
     String API_URL;
@@ -49,9 +53,10 @@ public class PositionService {
                 .title(positionCredentials.getTitle())
                 .location(positionCredentials.getLocation())
                 .build();
+        newPosition.setUrl("localhost:8080/positions/" + newPosition.getId());
 
         positionRepository.save(newPosition);
-        return "localhost:8080/positions/" + newPosition.getId();
+        return newPosition.getUrl();
     }
 
     public Position getPosition(UUID id) {
@@ -67,9 +72,10 @@ public class PositionService {
         searchInApi(title, location);
 
         ResponseItem[] pos = searchInApi(title, location);
-        System.out.println(pos);
-
-        return searchInDatabase(title, location);
+        Set<Position> apiPositions = responseConverter.convertResponseBody(pos);
+        Set<Position> dbPositions = searchInDatabase(title, location);
+        apiPositions.addAll(dbPositions);
+        return apiPositions;
     }
 
     private Set<Position> searchInDatabase(String title, String location) {
