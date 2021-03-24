@@ -28,7 +28,7 @@ public class PositionService {
                 .orElseThrow(() -> new Error("not good"));
 
         Position newPosition = Position.builder()
-                .description(positionCredentials.getDescription())
+                .title(positionCredentials.getTitle())
                 .location(positionCredentials.getLocation())
                 .build();
 
@@ -41,12 +41,12 @@ public class PositionService {
         return positionRepository.findById(id).get();
     }
 
-    public Set<Position> searchPositions(String description, String location, UUID apiKey) throws Error {
+    public Set<Position> searchPositions(String title, String location, UUID apiKey) throws Error {
 
         keyRepository
                 .findById(apiKey)
                 .orElseThrow(() -> new Error("not good"));
 
-        return positionRepository.getPositionByKeywordAndLocation(description, location);
+        return positionRepository.getPositionByKeywordAndLocation(title, location);
     }
 }

@@ -31,10 +31,10 @@ public class PositionController {
     @GetMapping()
     public Set<Position> searchPositions(
             @RequestParam(required = false)
-                    String description,
+                    String title,
                     String location,
             @RequestParam UUID apiKey) {
 
-        return positionService.searchPositions(description, location, apiKey);
+        return positionService.searchPositions(title, location, apiKey);
     }
 }
