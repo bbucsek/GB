@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,19 +35,22 @@ public class PositionService {
     InputValidator inputValidator;
 
     @Value("https://jobs.github.com/positions.json?")
-    String API_URL;
+    private String API_URL;
 
     @Value("description=")
-    String API_DESCRIPTION;
+    private String API_DESCRIPTION;
 
     @Value("location=")
-    String API_LOCATION;
+    private String API_LOCATION;
 
     @Value("page=")
-    String API_PAGINATION;
+    private String API_PAGINATION;
 
     @Value("&")
-    String API_AMPERSAND;
+    private String API_AMPERSAND;
+
+    @Value("localhost:8080/positions/")
+    private String urlTemplate;
 
     public String createPosition(PositionCredentials positionCredentials) throws WrongInputException, InvalidApiKeyException {
 
@@ -61,7 +63,7 @@ public class PositionService {
                 .location(positionCredentials.getLocation())
                 .build();
 
-        newPosition.setUrl("localhost:8080/positions/" + newPosition.getId());
+        newPosition.setUrl(urlTemplate + newPosition.getId());
 
         positionRepository.save(newPosition);
         return newPosition.getUrl();
@@ -83,19 +85,6 @@ public class PositionService {
     private Set<Position> searchInDatabase(String title, String location) {
         return positionRepository.getPositionByKeywordAndLocation(title, location);
     };
-
-    private ResponseItem[] searchInApi(String title, String location) {
-        String queryString = createApiUrl(title, location, 0);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ResponseItem[]> positionResponseEntity = restTemplate.exchange(
-                queryString,
-                HttpMethod.GET,
-                null,
-                ResponseItem[].class
-        );
-        return positionResponseEntity.getBody();
-    }
 
     private Set<Position> getAllApiPosition(String title, String location, Integer page, Set<Position> positions) {
         String queryString = createApiUrl(title, location, page);
