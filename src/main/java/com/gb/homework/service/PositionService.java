@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
@@ -74,12 +75,9 @@ public class PositionService {
     public Set<Position> searchPositions(String title, String location, UUID apiKey) throws Error, InvalidApiKeyException {
 
         validateApiKey(apiKey);
-
-        ResponseItem[] pos = searchInApi(title, location);
-        Set<Position> apiPositions = responseConverter.convertResponseBody(pos);
         Set<Position> dbPositions = searchInDatabase(title, location);
-        apiPositions.addAll(dbPositions);
-        return apiPositions;
+        getAllApiPosition(title, location, 0, dbPositions);
+        return dbPositions;
     }
 
     private Set<Position> searchInDatabase(String title, String location) {
@@ -87,15 +85,48 @@ public class PositionService {
     };
 
     private ResponseItem[] searchInApi(String title, String location) {
-        String queryString = createApiUrl(title, location);
+        String queryString = createApiUrl(title, location, 0);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ResponseItem[]> positionResponseEntity = restTemplate.exchange(queryString, HttpMethod.GET, null, ResponseItem[].class);
+        ResponseEntity<ResponseItem[]> positionResponseEntity = restTemplate.exchange(
+                queryString,
+                HttpMethod.GET,
+                null,
+                ResponseItem[].class
+        );
         return positionResponseEntity.getBody();
     }
 
-    private String createApiUrl(String title, String location) {
-        return API_URL + API_DESCRIPTION + title + API_AMPERSAND + API_LOCATION + location;
+    private Set<Position> getAllApiPosition(String title, String location, Integer page, Set<Position> positions) {
+        String queryString = createApiUrl(title, location, page);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<ResponseItem[]> positionResponseEntity = restTemplate.exchange(
+                queryString,
+                HttpMethod.GET,
+                null,
+                ResponseItem[].class
+        );
+        ResponseItem[] res = positionResponseEntity.getBody();
+        Set<Position> newPositions = responseConverter.convertResponseBody(res);
+        if (newPositions.size() > 50) {
+            positions.addAll(newPositions);
+            return getAllApiPosition(title, location, page + 1, positions);
+        }
+        positions.addAll(newPositions);
+        return positions;
+    };
+
+    private String createApiUrl(String title, String location, Integer page) {
+        return API_URL
+                + API_DESCRIPTION
+                + title
+                + API_AMPERSAND
+                + API_LOCATION
+                + location
+                + API_AMPERSAND
+                + API_PAGINATION
+                + page;
     }
 
     private void validateApiKey(UUID apiKey) throws InvalidApiKeyException {
