@@ -1,5 +1,7 @@
 package com.gb.homework.controller;
 
+import com.gb.homework.exception.exceptions.InvalidApiKeyException;
+import com.gb.homework.exception.exceptions.WrongInputException;
 import com.gb.homework.model.Position;
 import com.gb.homework.model.credentials.PositionCredentials;
 import com.gb.homework.service.PositionService;
@@ -23,7 +25,7 @@ public class PositionController {
     };
 
     @PostMapping()
-    public String createPosition(@RequestBody PositionCredentials positionCredentials) throws Error {
+    public String createPosition(@RequestBody PositionCredentials positionCredentials) throws WrongInputException, InvalidApiKeyException {
 
         return positionService.createPosition(positionCredentials);
     }
@@ -33,7 +35,7 @@ public class PositionController {
             @RequestParam(required = false)
                     String title,
                     String location,
-            @RequestParam UUID apiKey) {
+            @RequestParam UUID apiKey) throws InvalidApiKeyException {
 
         return positionService.searchPositions(title, location, apiKey);
     }

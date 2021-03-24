@@ -19,7 +19,6 @@ import java.util.UUID;
 public class Position {
 
     @Id
-    @GeneratedValue
     @JsonIgnore
     private UUID id;
 

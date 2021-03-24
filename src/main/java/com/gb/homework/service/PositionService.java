@@ -1,10 +1,13 @@
 package com.gb.homework.service;
 
+import com.gb.homework.exception.exceptions.InvalidApiKeyException;
+import com.gb.homework.exception.exceptions.WrongInputException;
 import com.gb.homework.model.Position;
 import com.gb.homework.model.api.ResponseItem;
 import com.gb.homework.model.credentials.PositionCredentials;
 import com.gb.homework.repository.KeyRepository;
 import com.gb.homework.repository.PositionRepository;
+import com.gb.homework.util.InputValidator;
 import com.gb.homework.util.ResponseConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +31,9 @@ public class PositionService {
     @Autowired
     ResponseConverter responseConverter;
 
+    @Autowired
+    InputValidator inputValidator;
+
     @Value("https://jobs.github.com/positions.json?")
     String API_URL;
 
@@ -43,16 +49,17 @@ public class PositionService {
     @Value("&")
     String API_AMPERSAND;
 
-    public String createPosition(PositionCredentials positionCredentials) throws Error{
+    public String createPosition(PositionCredentials positionCredentials) throws WrongInputException, InvalidApiKeyException {
 
-        keyRepository
-                .findById(positionCredentials.getApiKey())
-                .orElseThrow(() -> new Error("not good"));
+        validateApiKey(positionCredentials.getApiKey());
+        validatePositionInputs(positionCredentials);
 
         Position newPosition = Position.builder()
+                .id(UUID.randomUUID())
                 .title(positionCredentials.getTitle())
                 .location(positionCredentials.getLocation())
                 .build();
+
         newPosition.setUrl("localhost:8080/positions/" + newPosition.getId());
 
         positionRepository.save(newPosition);
@@ -64,12 +71,9 @@ public class PositionService {
         return positionRepository.findById(id).get();
     }
 
-    public Set<Position> searchPositions(String title, String location, UUID apiKey) throws Error {
+    public Set<Position> searchPositions(String title, String location, UUID apiKey) throws Error, InvalidApiKeyException {
 
-        keyRepository
-                .findById(apiKey)
-                .orElseThrow(() -> new Error("not good"));
-        searchInApi(title, location);
+        validateApiKey(apiKey);
 
         ResponseItem[] pos = searchInApi(title, location);
         Set<Position> apiPositions = responseConverter.convertResponseBody(pos);
@@ -93,4 +97,25 @@ public class PositionService {
     private String createApiUrl(String title, String location) {
         return API_URL + API_DESCRIPTION + title + API_AMPERSAND + API_LOCATION + location;
     }
+
+    private void validateApiKey(UUID apiKey) throws InvalidApiKeyException {
+        keyRepository
+                .findById(apiKey)
+                .orElseThrow(() -> new InvalidApiKeyException("Wrong api key!", new Throwable()));
+    }
+
+    private void validatePositionInputs(PositionCredentials positionCredentials) throws WrongInputException {
+        inputValidator.inputLengthValidation(
+                positionCredentials.getTitle(),
+                50,
+                "Position title is too long!"
+        );
+
+        inputValidator.inputLengthValidation(
+                positionCredentials.getLocation(),
+                50,
+                "Position location is too long!"
+        );
+    }
+
 }
