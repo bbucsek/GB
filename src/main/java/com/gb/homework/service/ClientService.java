@@ -6,20 +6,11 @@ import com.gb.homework.repository.ClientRepository;
 import com.gb.homework.repository.KeyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.UUID;
 
 @Component
 public class ClientService {
-
-    private final PasswordEncoder passWordEncoder;
-
-    public ClientService() {
-
-        this.passWordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
 
     @Autowired
     ClientRepository clientRepository;

@@ -15,7 +15,7 @@ public class PositionCredentials {
 
     private String location;
 
-    private String jobTitle;
+    private String description;
 
     private UUID apiKey;
 

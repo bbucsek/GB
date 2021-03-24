@@ -19,6 +19,8 @@ public class PositionService {
     @Autowired
     KeyRepository keyRepository;
 
+    private final String API_URL = "https://jobs.github.com/positions.json?";
+
     public String createPosition(PositionCredentials positionCredentials) throws Error{
 
         keyRepository
@@ -26,7 +28,7 @@ public class PositionService {
                 .orElseThrow(() -> new Error("not good"));
 
         Position newPosition = Position.builder()
-                .jobTitle(positionCredentials.getJobTitle())
+                .description(positionCredentials.getDescription())
                 .location(positionCredentials.getLocation())
                 .build();
 
@@ -39,12 +41,12 @@ public class PositionService {
         return positionRepository.findById(id).get();
     }
 
-    public Set<Position> searchPositions(String keyword, String location, UUID apiKey) throws Error {
+    public Set<Position> searchPositions(String description, String location, UUID apiKey) throws Error {
 
         keyRepository
                 .findById(apiKey)
                 .orElseThrow(() -> new Error("not good"));
 
-        return positionRepository.getPositionByKeywordAndLocation(keyword, location);
+        return positionRepository.getPositionByKeywordAndLocation(description, location);
     }
 }

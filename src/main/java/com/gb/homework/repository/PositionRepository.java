@@ -13,8 +13,8 @@ public interface PositionRepository extends JpaRepository<Position, UUID> {
 
     @Query(
             "SELECT p FROM Position p " +
-            "WHERE p.jobTitle LIKE %?1% " +
+            "WHERE p.description LIKE %?1% " +
             "AND p.location LIKE %?2% "
     )
-    Set<Position> getPositionByKeywordAndLocation(String title, String location);
+    Set<Position> getPositionByKeywordAndLocation(String description, String location);
 }

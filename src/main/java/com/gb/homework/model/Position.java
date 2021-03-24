@@ -21,7 +21,7 @@ public class Position {
     @GeneratedValue
     private UUID id;
 
-    private String jobTitle;
+    private String description;
 
     private String location;
 
